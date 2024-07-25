@@ -1,0 +1,40 @@
+#!/bin/python
+
+from sys import platform
+from datetime import datetime
+import psutil
+
+with open("/proc/meminfo", "r") as f:
+    mem_total = f.read().split("MemTotal:        ")[1].split(" ")[0]
+    mem_total = str(round(int(mem_total) / 1e+6, 2)) + " gb"
+with open("/proc/meminfo", "r") as f:    
+    mem_used = f.read().split("Active:          ")[1].split(" ")[0]
+    mem_used = str(round(int(mem_used) / 1e+6, 2)) + " gb"
+
+today = datetime.today()
+date = today.strftime("%d/%m/%y @ %I:%M%p")
+
+
+info = {
+    " ": "",
+    "  ": "",
+    "   ": "",
+    "OS": platform,
+    "MEM": f"{mem_used}/{mem_total}",
+    "DATE": date,
+    "CPU": f"{psutil.cpu_percent(0.3)}%"
+}
+
+WHITE = "\033[0;37m"
+PURPLE = "\033[0;35m"
+CYAN = "\033[0;36m"
+print(WHITE)
+
+with open("/home/jakes/customisations/logo.txt", "r") as f:
+    contents = f.read().split("\n")
+    pad_length = max([len(l) for l in contents]) + 2
+    info_pad_length = max([len(l) for l in list(info.keys())]) + 2
+    for line in range(len(contents)):
+        this_key = (f"{list(info.keys())[line]}") if (line < len(info)) else ""
+        this_value = info[this_key] if (line < len(info)) else ""
+        print(f"{PURPLE}{contents[line]}{' ' * (pad_length - len(contents[line]))}{CYAN}{this_key}{' ' * (info_pad_length - len(this_key))} {WHITE}{this_value}")
